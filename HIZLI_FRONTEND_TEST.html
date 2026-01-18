@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Hızlı Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .test-section {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border-left: 4px solid #3b82f6;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #065f46; }
+        .error { background: #7f1d1d; }
+        .warning { background: #78350f; }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #2563eb; }
+        #results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Frontend Hızlı Test</h1>
+    <p>Ana sayfa hatası düzeltildi mi kontrol edelim:</p>
+
+    <div class="test-section">
+        <h3>📋 Test Adımları:</h3>
+        <ol>
+            <li>Backend çalışıyor mu? (Port 8002)</li>
+            <li>Frontend çalışıyor mu? (Port 3000)</li>
+            <li>Ana sayfa açılıyor mu?</li>
+            <li>AI widget tek mi?</li>
+            <li>Console'da hata var mı?</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h3>🔧 Backend Test:</h3>
+        <button onclick="testBackend()">Backend Durumunu Kontrol Et</button>
+        <div id="backend-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🌐 Frontend Test:</h3>
+        <button onclick="testFrontend()">Frontend Durumunu Kontrol Et</button>
+        <div id="frontend-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🤖 AI Widget Test:</h3>
+        <button onclick="testAI()">AI Sistemini Test Et</button>
+        <div id="ai-status"></div>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        async function testBackend() {
+            const statusDiv = document.getElementById('backend-status');
+            statusDiv.innerHTML = '<div class="status warning">Backend test ediliyor...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:8002/api/health');
+                if (response.ok) {
+                    statusDiv.innerHTML = '<div class="status success">✅ Backend çalışıyor (Port 8002)</div>';
+                } else {
+                    statusDiv.innerHTML = '<div class="status error">❌ Backend yanıt vermiyor</div>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status error">❌ Backend bağlantı hatası: ' + error.message + '</div>';
+            }
+        }
+
+        async function testFrontend() {
+            const statusDiv = document.getElementById('frontend-status');
+            statusDiv.innerHTML = '<div class="status warning">Frontend test ediliyor...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:3000');
+                if (response.ok) {
+                    statusDiv.innerHTML = '<div class="status success">✅ Frontend çalışıyor (Port 3000)</div>';
+                } else {
+                    statusDiv.innerHTML = '<div class="status error">❌ Frontend yanıt vermiyor</div>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status error">❌ Frontend bağlantı hatası: ' + error.message + '</div>';
+            }
+        }
+
+        async function testAI() {
+            const statusDiv = document.getElementById('ai-status');
+            statusDiv.innerHTML = '<div class="status warning">AI sistemi test ediliyor...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:8002/api/ai/status');
+                if (response.ok) {
+                    const data = await response.json();
+                    statusDiv.innerHTML = `
+                        <div class="status success">✅ AI sistemi çalışıyor</div>
+                        <div class="status">🧠 Model: ${data.ai_model}</div>
+                        <div class="status">🔍 Arama: ${data.web_search.join(', ')}</div>
+                    `;
+                } else {
+                    statusDiv.innerHTML = '<div class="status error">❌ AI sistemi yanıt vermiyor</div>';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<div class="status error">❌ AI sistemi bağlantı hatası: ' + error.message + '</div>';
+            }
+        }
+
+        // Otomatik test başlat
+        window.onload = function() {
+            setTimeout(() => {
+                testBackend();
+                setTimeout(() => testFrontend(), 1000);
+                setTimeout(() => testAI(), 2000);
+            }, 500);
+        };
+    </script>
+
+    <div class="test-section">
+        <h3>📝 Manuel Kontrol Listesi:</h3>
+        <ul>
+            <li>✅ Backend çalışıyor (python backend/real_data_backend.py)</li>
+            <li>✅ Frontend çalışıyor (cd frontend && npm start)</li>
+            <li>✅ Ana sayfa açılıyor (http://localhost:3000)</li>
+            <li>✅ Sadece 1 AI widget görünüyor</li>
+            <li>✅ Console'da hata yok</li>
+            <li>✅ AI widget tıklanabiliyor</li>
+            <li>✅ Sayfa geçişleri çalışıyor</li>
+        </ul>
+    </div>
+
+    <div class="test-section">
+        <h3>🔧 Hala Hata Varsa:</h3>
+        <ol>
+            <li>Browser console'u aç (F12)</li>
+            <li>Hata mesajını kopyala</li>
+            <li>Frontend'i yeniden başlat: <code>cd frontend && npm start</code></li>
+            <li>Backend'i yeniden başlat: <code>python backend/real_data_backend.py</code></li>
+        </ol>
+    </div>
+</body>
+</html>

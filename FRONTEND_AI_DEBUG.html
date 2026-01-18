@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend AI Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #333; border-radius: 8px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .success { background: #1a4a1a; border: 1px solid #4a8a4a; }
+        .error { background: #4a1a1a; border: 1px solid #8a4a4a; }
+        button { padding: 10px 20px; margin: 5px; background: #4a4a8a; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #6a6aaa; }
+        textarea { width: 100%; height: 200px; background: #2a2a2a; color: white; border: 1px solid #4a4a4a; padding: 10px; }
+        input { padding: 8px; margin: 5px; background: #2a2a2a; color: white; border: 1px solid #4a4a4a; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 Frontend AI Debug Tool</h1>
+        
+        <div class="test-section">
+            <h2>1. Backend Connection Test</h2>
+            <button onclick="testBackendConnection()">Test Backend</button>
+            <div id="backend-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>2. AI Endpoint Test</h2>
+            <input type="text" id="test-message" placeholder="Test message" value="hey">
+            <button onclick="testAIEndpoint()">Test AI</button>
+            <div id="ai-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>3. Frontend Widget Test</h2>
+            <p>Bu test frontend'in gerçek AI widget'ını kullanır:</p>
+            <button onclick="testFrontendWidget()">Test Frontend Widget</button>
+            <div id="widget-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>4. Network Requests Monitor</h2>
+            <p>Browser Developer Tools'da Network tab'ını açın ve aşağıdaki butona basın:</p>
+            <button onclick="monitorRequests()">Send Test Request</button>
+            <div id="monitor-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>5. Debug Log</h2>
+            <textarea id="debug-log" readonly></textarea>
+            <button onclick="clearLog()">Clear Log</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8003/api';
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logArea = document.getElementById('debug-log');
+            logArea.value += `[${timestamp}] ${message}\n`;
+            logArea.scrollTop = logArea.scrollHeight;
+            console.log(message);
+        }
+        
+        function showResult(elementId, message, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="${isSuccess ? 'success' : 'error'}">${message}</div>`;
+        }
+        
+        async function testBackendConnection() {
+            log('Testing backend connection...');
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('backend-result', `✅ Backend connected: ${data.status}`, true);
+                    log('✅ Backend connection successful');
+                } else {
+                    showResult('backend-result', `❌ Backend error: ${response.status}`, false);
+                    log(`❌ Backend error: ${response.status}`);
+                }
+            } catch (error) {
+                showResult('backend-result', `❌ Connection failed: ${error.message}`, false);
+                log(`❌ Backend connection failed: ${error.message}`);
+            }
+        }
+        
+        async function testAIEndpoint() {
+            const message = document.getElementById('test-message').value;
+            log(`Testing AI endpoint with message: "${message}"`);
+            
+            try {
+                const payload = {
+                    message: message,
+                    user_context: { location: "Denver, Colorado" },
+                    learning_enabled: true
+                };
+                
+                log(`Sending request to: ${API_BASE}/autonomous-ai/chat`);
+                log(`Payload: ${JSON.stringify(payload, null, 2)}`);
+                
+                const response = await fetch(`${API_BASE}/autonomous-ai/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const answer = data.answer || 'No answer';
+                    const source = data.source || 'unknown';
+                    
+                    log(`✅ AI Response received - Source: ${source}`);
+                    log(`Answer: ${answer.substring(0, 100)}...`);
+                    
+                    if (answer.startsWith("I'm continuously learning")) {
+                        showResult('ai-result', `❌ Generic fallback response received!<br>Source: ${source}<br>Answer: ${answer.substring(0, 200)}...`, false);
+                        log('❌ Generic fallback response detected!');
+                    } else {
+                        showResult('ai-result', `✅ Specific response received!<br>Source: ${source}<br>Answer: ${answer.substring(0, 200)}...`, true);
+                        log('✅ Specific response received!');
+                    }
+                } else {
+                    showResult('ai-result', `❌ AI endpoint error: ${response.status}`, false);
+                    log(`❌ AI endpoint error: ${response.status}`);
+                }
+            } catch (error) {
+                showResult('ai-result', `❌ AI request failed: ${error.message}`, false);
+                log(`❌ AI request failed: ${error.message}`);
+            }
+        }
+        
+        async function testFrontendWidget() {
+            log('Testing frontend widget...');
+            
+            // Check if AutonomousAIChatWidget is loaded
+            const brainIcon = document.querySelector('[data-testid="autonomous-ai-chat-toggle"]');
+            if (brainIcon) {
+                showResult('widget-result', '✅ Autonomous AI widget found in DOM', true);
+                log('✅ Autonomous AI widget found');
+            } else {
+                showResult('widget-result', '❌ Autonomous AI widget not found in DOM', false);
+                log('❌ Autonomous AI widget not found');
+            }
+        }
+        
+        async function monitorRequests() {
+            log('Sending monitored request...');
+            
+            // This will show up in Network tab
+            try {
+                const response = await fetch(`${API_BASE}/autonomous-ai/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: "Monitor test",
+                        user_context: { location: "Denver, Colorado" },
+                        learning_enabled: true
+                    })
+                });
+                
+                showResult('monitor-result', '✅ Request sent - Check Network tab in Developer Tools', true);
+                log('✅ Monitor request sent - check Network tab');
+            } catch (error) {
+                showResult('monitor-result', `❌ Monitor request failed: ${error.message}`, false);
+                log(`❌ Monitor request failed: ${error.message}`);
+            }
+        }
+        
+        function clearLog() {
+            document.getElementById('debug-log').value = '';
+        }
+        
+        // Auto-run backend test on load
+        window.onload = function() {
+            log('🧠 Frontend AI Debug Tool loaded');
+            log('Backend URL: ' + API_BASE);
+            testBackendConnection();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test AI Red Rocks Response</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .container {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .response {
+            background: #333;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+        .loading {
+            color: #ffa500;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .error {
+            color: #f44336;
+        }
+        .status {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤖 Test Autonomous AI - Red Rocks Response Fix</h1>
+    
+    <div class="container">
+        <h2>🎯 Test the Fixed AI Response</h2>
+        <p>This page tests if the autonomous AI properly handles Red Rocks event questions.</p>
+        
+        <button onclick="testRedRocksQuestion()">🎵 Test: "Show me tonight's events at Red Rocks"</button>
+        <button onclick="testGeneralQuestion()">🍺 Test: "What are the best bars in Denver?"</button>
+        <button onclick="testAIStatus()">📊 Test: AI Status</button>
+        <button onclick="clearResults()">🧹 Clear Results</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <div class="container">
+        <h2>📋 Expected Results</h2>
+        <div class="response">
+<strong>For Red Rocks Question, AI should respond with:</strong>
+
+🎵 <strong>Red Rocks Amphitheatre Events Tonight:</strong>
+
+🎫 <strong>Tonight's Events</strong>: Check the official Red Rocks website for tonight's lineup
+🚗 <strong>Parking</strong>: Arrive 2+ hours early - parking fills up fast!
+🚌 <strong>Shuttle</strong>: Available from downtown Denver
+🌡️ <strong>Weather</strong>: Dress in layers - mountain weather changes quickly
+📱 <strong>Real-time Info</strong>: Visit redrocksonline.com for current events
+
+<strong>Pro Tips:</strong>
+• Gates typically open 2 hours before showtime
+• Bring a blanket or cushion for the stone seats
+• No outside food/drinks allowed
+• Amazing acoustics - every seat has great sound!
+
+Would you like me to help you find specific event information or transportation options?
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:8003';
+        
+        function addResult(title, content, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = 'response';
+            div.innerHTML = `
+                <h3>${title}</h3>
+                <div class="${type}">${content}</div>
+                <div class="status">Time: ${new Date().toLocaleTimeString()}</div>
+            `;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        async function testRedRocksQuestion() {
+            addResult('🎵 Testing Red Rocks Question', 'Sending request...', 'loading');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/autonomous-ai/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: "Show me tonight's events at Red Rocks",
+                        user_context: {
+                            location: "Denver, Colorado"
+                        },
+                        learning_enabled: true
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(
+                        '✅ Red Rocks Response Received',
+                        `<strong>Confidence:</strong> ${data.confidence}\n<strong>Source:</strong> ${data.source}\n<strong>Learning Applied:</strong> ${data.learning_applied}\n\n<strong>Answer:</strong>\n${data.answer}`,
+                        'success'
+                    );
+                } else {
+                    addResult('❌ Red Rocks Test Failed', `HTTP ${response.status}: ${await response.text()}`, 'error');
+                }
+            } catch (error) {
+                addResult('❌ Red Rocks Test Error', `Network error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testGeneralQuestion() {
+            addResult('🍺 Testing General Question', 'Sending request...', 'loading');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/autonomous-ai/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: "What are the best bars in Denver?",
+                        user_context: {
+                            location: "Denver, Colorado"
+                        },
+                        learning_enabled: true
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(
+                        '✅ General Question Response',
+                        `<strong>Confidence:</strong> ${data.confidence}\n<strong>Source:</strong> ${data.source}\n\n<strong>Answer Preview:</strong>\n${data.answer.substring(0, 200)}...`,
+                        'success'
+                    );
+                } else {
+                    addResult('❌ General Test Failed', `HTTP ${response.status}: ${await response.text()}`, 'error');
+                }
+            } catch (error) {
+                addResult('❌ General Test Error', `Network error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testAIStatus() {
+            addResult('📊 Testing AI Status', 'Checking status...', 'loading');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/autonomous-ai/status`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(
+                        '✅ AI Status Retrieved',
+                        `<strong>System:</strong> ${data.system_name}\n<strong>Version:</strong> ${data.version}\n<strong>Status:</strong> ${data.status}\n<strong>Learning:</strong> ${data.self_improvement?.enabled}\n<strong>Success Rate:</strong> ${data.self_improvement?.success_rate}`,
+                        'success'
+                    );
+                } else {
+                    addResult('❌ Status Test Failed', `HTTP ${response.status}: ${await response.text()}`, 'error');
+                }
+            } catch (error) {
+                addResult('❌ Status Test Error', `Network error: ${error.message}`, 'error');
+            }
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        // Auto-test on page load
+        window.onload = function() {
+            addResult('🚀 Page Loaded', 'Ready to test autonomous AI responses!', 'success');
+            addResult('💡 Instructions', 'Make sure the backend is running on http://localhost:8003 before testing.', 'info');
+        };
+    </script>
+</body>
+</html>

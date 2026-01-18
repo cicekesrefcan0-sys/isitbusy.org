@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Frontend Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        .container {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button.danger {
+            background: #f44336;
+        }
+        button.danger:hover {
+            background: #da190b;
+        }
+        .response {
+            background: #333;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .loading {
+            color: #ffa500;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .error {
+            color: #f44336;
+        }
+        .status {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+        .test-section {
+            border-left: 4px solid #4CAF50;
+            padding-left: 15px;
+            margin: 20px 0;
+        }
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            background: #333;
+            border: 1px solid #555;
+            color: #fff;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🤖 Autonomous AI Frontend Test</h1>
+    
+    <div class="container">
+        <h2>🔍 Backend Bağlantı Testleri</h2>
+        <button onclick="testBackendHealth()">🏥 Backend Health Check</button>
+        <button onclick="testAIStatus()">📊 AI Status Check</button>
+        <button onclick="testAIEndpoints()">🔗 Tüm AI Endpoint'leri Test Et</button>
+        <button onclick="clearResults()" class="danger">🧹 Sonuçları Temizle</button>
+    </div>
+
+    <div class="container">
+        <h2>💬 AI Chat Testleri</h2>
+        <div class="test-section">
+            <h3>Hazır Test Soruları</h3>
+            <button onclick="testQuestion('Hello, test message')">👋 Basit Test</button>
+            <button onclick="testQuestion('What are the best bars in Denver?')">🍺 Denver Barları</button>
+            <button onclick="testQuestion('Show me tonight\\'s events at Red Rocks')">🎵 Red Rocks Etkinlikleri</button>
+            <button onclick="testQuestion('Tell me about RiNo neighborhood')">🏙️ RiNo Mahallesi</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>Özel Soru Testi</h3>
+            <input type="text" id="customQuestion" placeholder="Kendi sorunuzu yazın..." />
+            <button onclick="testCustomQuestion()">📤 Gönder</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎯 Özel Red Rocks Testi</h2>
+        <p>Bu test özellikle Red Rocks sorusunun doğru yanıtlanıp yanıtlanmadığını kontrol eder.</p>
+        <button onclick="testRedRocksSpecific()">🎵 Red Rocks Özel Test</button>
+        <button onclick="testMultipleRedRocksQuestions()">🔄 Çoklu Red Rocks Testi</button>
+    </div>
+
+    <div class="container">
+        <h2>📊 Test Sonuçları</h2>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:8003';
+        let testCount = 0;
+        
+        function addResult(title, content, type = 'info') {
+            testCount++;
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = 'response';
+            div.innerHTML = `
+                <h3>#${testCount} - ${title}</h3>
+                <div class="${type}">${content}</div>
+                <div class="status">Zaman: ${new Date().toLocaleTimeString()}</div>
+            `;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        async function testBackendHealth() {
+            addResult('🏥 Backend Health Check', 'Kontrol ediliyor...', 'loading');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(
+                        '✅ Backend Health OK',
+                        `Status: ${data.status}\nDatabase: ${data.database}\nTimestamp: ${data.timestamp}`,
+                        'success'
+                    );
+                } else {
+                    addResult('❌ Backend Health Failed', `HTTP ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult('❌ Backend Health Error', `Bağlantı hatası: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testAIStatus() {
+            addResult('📊 AI Status Check', 'Kontrol ediliyor...', 'loading');
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/autonomous-ai/status`);
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult(
+                        '✅ AI Status OK',
+                        `System: ${data.system_name}\nVersion: ${data.version}\nStatus: ${data.status}\nLearning: ${data.self_improvement?.enabled}`,
+                        'success'
+                    );
+                } else {
+                    const errorText = await response.text();
+                    addResult('❌ AI Status Failed', `HTTP ${response.status}: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                addResult('❌ AI Status Error', `Bağlantı hatası: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testAIEndpoints() {
+            addResult('🔗 AI Endpoints Test', 'Tüm endpoint\'ler test ediliyor...', 'loading');
+            
+            const endpoints = [
+                { name: 'Status', url: '/api/autonomous-ai/status', method: 'GET' },
+                { name: 'Suggestions', url: '/api/autonomous-ai/suggestions', method: 'GET' },
+                { name: 'Learning Stats', url: '/api/autonomous-ai/learning-stats', method: 'GET' },
+                { name: 'Health', url: '/api/autonomous-ai/health', method: 'GET' }
+            ];
+            
+            let results = [];
+            for (const endpoint of endpoints) {
+                try {
+                    const response = await fetch(`${BACKEND_URL}${endpoint.url}`);
+                    const status = response.ok ? '✅' : '❌';
+                    results.push(`${status} ${endpoint.name}: ${response.status}`);
+                } catch (error) {
+                    results.push(`❌ ${endpoint.name}: Bağlantı hatası`);
+                }
+            }
+            
+            addResult('🔗 AI Endpoints Results', results.join('\n'), 'info');
+        }
+        
+        async function testQuestion(question) {
+            addResult(`💬 AI Chat Test: "${question}"`, 'Soru gönderiliyor...', 'loading');
+            
+            try {
+                const payload = {
+                    message: question,
+                    user_context: {
+                        location: "Denver, Colorado"
+                    },
+                    learning_enabled: true
+                };
+                
+                const startTime = Date.now();
+                const response = await fetch(`${BACKEND_URL}/api/autonomous-ai/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const responseTime = Date.now() - startTime;
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const answer = data.answer || 'Yanıt yok';
+                    
+                    addResult(
+                        `✅ AI Yanıt Alındı (${responseTime}ms)`,
+                        `Soru: ${question}\n\nConfidence: ${data.confidence}\nSource: ${data.source}\nLearning Applied: ${data.learning_applied}\n\nYanıt:\n${answer}`,
+                        'success'
+                    );
+                } else {
+                    const errorText = await response.text();
+                    addResult('❌ AI Chat Failed', `HTTP ${response.status}: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                addResult('❌ AI Chat Error', `Hata: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testCustomQuestion() {
+            const question = document.getElementById('customQuestion').value;
+            if (!question.trim()) {
+                addResult('⚠️ Uyarı', 'Lütfen bir soru yazın', 'error');
+                return;
+            }
+            
+            await testQuestion(question);
+            document.getElementById('customQuestion').value = '';
+        }
+        
+        async function testRedRocksSpecific() {
+            addResult('🎵 Red Rocks Özel Test', 'Red Rocks sorusu özel olarak test ediliyor...', 'loading');
+            
+            const question = "Show me tonight's events at Red Rocks";
+            
+            try {
+                const payload = {
+                    message: question,
+                    user_context: { location: "Denver, Colorado" },
+                    learning_enabled: true
+                };
+                
+                const response = await fetch(`${BACKEND_URL}/api/autonomous-ai/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const answer = data.answer || '';
+                    
+                    // Red Rocks özel kontrolleri
+                    const hasRedRocks = answer.includes('Red Rocks');
+                    const hasEventInfo = answer.includes('event') || answer.includes('concert');
+                    const hasUsefulInfo = answer.length > 200;
+                    const isGeneric = answer.includes('I can help you discover') || answer.includes('What would you like to explore');
+                    
+                    let quality = 'Unknown';
+                    let qualityColor = 'info';
+                    
+                    if (isGeneric) {
+                        quality = '❌ Generic Response (Problem!)';
+                        qualityColor = 'error';
+                    } else if (hasRedRocks && hasEventInfo && hasUsefulInfo) {
+                        quality = '✅ Excellent Red Rocks Response';
+                        qualityColor = 'success';
+                    } else if (hasRedRocks) {
+                        quality = '⚠️ Partial Red Rocks Response';
+                        qualityColor = 'loading';
+                    } else {
+                        quality = '❌ No Red Rocks Information';
+                        qualityColor = 'error';
+                    }
+                    
+                    addResult(
+                        `🎯 Red Rocks Test Result: ${quality}`,
+                        `Source: ${data.source}\nConfidence: ${data.confidence}\nAnswer Length: ${answer.length} characters\n\nChecks:\n- Contains "Red Rocks": ${hasRedRocks ? '✅' : '❌'}\n- Contains Event Info: ${hasEventInfo ? '✅' : '❌'}\n- Sufficient Length: ${hasUsefulInfo ? '✅' : '❌'}\n- Is Generic: ${isGeneric ? '❌ (Bad)' : '✅ (Good)'}\n\nFull Answer:\n${answer}`,
+                        qualityColor
+                    );
+                } else {
+                    addResult('❌ Red Rocks Test Failed', `HTTP ${response.status}`, 'error');
+                }
+            } catch (error) {
+                addResult('❌ Red Rocks Test Error', `Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testMultipleRedRocksQuestions() {
+            const questions = [
+                "Show me tonight's events at Red Rocks",
+                "What's happening at Red Rocks tonight?",
+                "Red Rocks events today",
+                "Tell me about Red Rocks Amphitheatre"
+            ];
+            
+            addResult('🔄 Çoklu Red Rocks Test', `${questions.length} farklı Red Rocks sorusu test ediliyor...`, 'loading');
+            
+            for (let i = 0; i < questions.length; i++) {
+                await new Promise(resolve => setTimeout(resolve, 1000)); // 1 saniye bekle
+                await testQuestion(questions[i]);
+            }
+            
+            addResult('🔄 Çoklu Test Tamamlandı', 'Tüm Red Rocks soruları test edildi. Sonuçları yukarıda görebilirsiniz.', 'success');
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            testCount = 0;
+            addResult('🧹 Temizlendi', 'Test sonuçları temizlendi. Yeni testler yapabilirsiniz.', 'success');
+        }
+        
+        // Sayfa yüklendiğinde otomatik test
+        window.onload = function() {
+            addResult('🚀 Test Sayfası Yüklendi', 'AI Frontend Test sayfası hazır. Backend\'in http://localhost:8003 adresinde çalıştığından emin olun.', 'success');
+        };
+        
+        // Enter tuşu ile özel soru gönderme
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('customQuestion').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    testCustomQuestion();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Cache Clear Solution - Fix AI Widget</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d1b69 100%);
+            color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(15, 15, 25, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin: 5px;
+        }
+        .status.working { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+        .status.issue { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .status.warning { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .step {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .step h3 {
+            color: #a855f7;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+        }
+        .test-result {
+            background: rgba(15, 15, 25, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #3b82f6;
+        }
+        .success { border-left-color: #22c55e; }
+        .error { border-left-color: #ef4444; }
+        .code {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+        .highlight {
+            background: rgba(139, 92, 246, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #a855f7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Cache Clear Solution</h1>
+            <p>Fix AI Widget Cache Issue - Get Autonomous AI Working</p>
+            
+            <div>
+                <span class="status working">✅ Backend Working</span>
+                <span class="status working">✅ PM2 Running</span>
+                <span class="status working">✅ Autonomous AI Active</span>
+                <span class="status issue">❌ Frontend Cache Issue</span>
+            </div>
+        </div>
+
+        <!-- Step 1: Quick Cache Clear -->
+        <div class="step">
+            <h3>🚀 Step 1: Quick Cache Clear (Try This First!)</h3>
+            <p>The fastest way to fix the cache issue:</p>
+            
+            <div class="code">
+1. Open: <span class="highlight">http://localhost:3000</span>
+2. Press: <span class="highlight">Ctrl+F5</span> (Windows) or <span class="highlight">Cmd+Shift+R</span> (Mac)
+3. Look for: <span class="highlight">Brain icon (🧠)</span> in bottom-right
+4. Test with: <span class="highlight">"hey"</span> message
+            </div>
+            
+            <button class="btn" onclick="openApp()">🌐 Open App (localhost:3000)</button>
+            <button class="btn" onclick="testAI()">🧠 Test AI Widget</button>
+        </div>
+
+        <!-- Step 2: Developer Tools Method -->
+        <div class="step">
+            <h3>🛠️ Step 2: Developer Tools Cache Clear</h3>
+            <p>If Step 1 doesn't work, use developer tools:</p>
+            
+            <div class="code">
+1. Press <span class="highlight">F12</span> to open Developer Tools
+2. Go to <span class="highlight">Network</span> tab
+3. Check <span class="highlight">"Disable cache"</span> checkbox
+4. Refresh page with <span class="highlight">F5</span>
+5. Test AI widget with brain icon
+            </div>
+            
+            <button class="btn" onclick="showDevToolsInstructions()">📋 Show Detailed Instructions</button>
+        </div>
+
+        <!-- Step 3: Incognito Test -->
+        <div class="step">
+            <h3>🕵️ Step 3: Incognito Mode Test</h3>
+            <p>Test in a clean environment without cache:</p>
+            
+            <div class="code">
+1. Open <span class="highlight">Incognito/Private</span> window
+2. Go to: <span class="highlight">http://localhost:3000</span>
+3. Look for <span class="highlight">Autonomous AI</span> widget
+4. Test with questions like <span class="highlight">"nightlife"</span>
+            </div>
+            
+            <button class="btn" onclick="openIncognito()">🕵️ Open Incognito Instructions</button>
+        </div>
+
+        <!-- Step 4: Frontend Restart -->
+        <div class="step">
+            <h3>🔄 Step 4: Frontend Restart (Nuclear Option)</h3>
+            <p>If all else fails, restart the frontend completely:</p>
+            
+            <div class="code">
+# Stop current frontend
+pm2 stop isitbusy-frontend
+
+# Or if running in terminal:
+Ctrl+C
+
+# Restart frontend
+cd esref1-main/frontend
+npm start
+
+# Should open on port 3000
+            </div>
+            
+            <button class="btn" onclick="checkPM2Status()">📊 Check PM2 Status</button>
+            <button class="btn" onclick="restartFrontend()">🔄 Restart Instructions</button>
+        </div>
+
+        <!-- Expected Results -->
+        <div class="step">
+            <h3>✅ Expected Results After Fix</h3>
+            <p>When the cache is cleared, you should see:</p>
+            
+            <div class="test-result success">
+                <strong>✅ Correct AI Widget:</strong>
+                <ul>
+                    <li>Brain icon (🧠) in bottom-right corner</li>
+                    <li>"Autonomous AI" title with "Self-Learning Active" indicator</li>
+                    <li>Purple/blue gradient design</li>
+                    <li>Settings gear icon in header</li>
+                </ul>
+            </div>
+            
+            <div class="test-result success">
+                <strong>✅ Correct AI Responses:</strong>
+                <ul>
+                    <li>"hey" → Friendly greeting with capabilities</li>
+                    <li>"nightlife" → 4 neighborhood guide (LoDo, RiNo, Capitol Hill, Highlands)</li>
+                    <li>"RiNo breweries" → Specific brewery recommendations</li>
+                    <li>"Red Rocks" → Detailed venue information</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Network Debugging -->
+        <div class="step">
+            <h3>🔍 Debug: Check Network Requests</h3>
+            <p>Verify the AI is using correct endpoints:</p>
+            
+            <div class="code">
+1. Open Developer Tools (F12)
+2. Go to <span class="highlight">Network</span> tab
+3. Send AI message
+4. Look for request to: <span class="highlight">/api/autonomous-ai/chat</span>
+5. Check response contains specific answers
+            </div>
+            
+            <div class="test-result" id="networkTest">
+                <strong>Network Test Results:</strong>
+                <div id="networkResults">Click "Test Network" to check endpoints</div>
+            </div>
+            
+            <button class="btn" onclick="testNetwork()">🌐 Test Network Requests</button>
+        </div>
+
+        <!-- Status Check -->
+        <div class="step">
+            <h3>📊 Current System Status</h3>
+            <div id="systemStatus">
+                <button class="btn" onclick="checkSystemStatus()">🔍 Check System Status</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openApp() {
+            window.open('http://localhost:3000', '_blank');
+            alert('🚀 App opened! Now press Ctrl+F5 to clear cache and look for the brain icon (🧠) in bottom-right corner.');
+        }
+
+        function testAI() {
+            alert(`🧠 AI Test Instructions:
+
+1. Look for BRAIN ICON (🧠) in bottom-right corner
+2. Click the brain icon to open AI chat
+3. You should see "Autonomous AI" title
+4. Test with these messages:
+   • "hey" → Should get friendly greeting
+   • "nightlife" → Should get neighborhood guide
+   • "RiNo breweries" → Should get specific recommendations
+
+If you still get generic "I'm continuously learning..." responses, the cache is still not cleared!`);
+        }
+
+        function showDevToolsInstructions() {
+            alert(`🛠️ Developer Tools Cache Clear:
+
+1. Press F12 to open Developer Tools
+2. Click "Network" tab at the top
+3. Look for "Disable cache" checkbox and CHECK IT
+4. Keep Developer Tools open
+5. Press F5 to refresh the page
+6. Test the AI widget (brain icon)
+7. In Network tab, you should see requests to "/api/autonomous-ai/chat"
+
+This forces the browser to fetch fresh files instead of using cache.`);
+        }
+
+        function openIncognito() {
+            alert(`🕵️ Incognito Mode Test:
+
+Chrome: Ctrl+Shift+N
+Firefox: Ctrl+Shift+P
+Edge: Ctrl+Shift+N
+
+1. Open incognito/private window
+2. Go to: http://localhost:3000
+3. Look for brain icon (🧠)
+4. Test AI responses
+
+If it works in incognito but not in regular browser, it's definitely a cache issue!`);
+        }
+
+        function checkPM2Status() {
+            alert(`📊 Check PM2 Status:
+
+Open terminal and run:
+pm2 status
+
+You should see:
+✅ isitbusy-backend (online)
+✅ isitbusy-frontend (online)
+
+If frontend is not running:
+pm2 start ecosystem.config.js --only isitbusy-frontend
+
+Or start manually:
+cd esref1-main/frontend
+npm start`);
+        }
+
+        function restartFrontend() {
+            alert(`🔄 Frontend Restart Instructions:
+
+Method 1 - PM2:
+pm2 restart isitbusy-frontend
+
+Method 2 - Manual:
+1. If running in terminal, press Ctrl+C
+2. cd esref1-main/frontend
+3. npm start
+4. Wait for "Local: http://localhost:3000"
+
+Method 3 - Full Reset:
+pm2 delete isitbusy-frontend
+cd esref1-main/frontend
+npm start
+
+This will completely restart the frontend with fresh cache.`);
+        }
+
+        async function testNetwork() {
+            const resultsDiv = document.getElementById('networkResults');
+            resultsDiv.innerHTML = 'Testing network requests...';
+            
+            try {
+                // Test backend connection
+                const response = await fetch('http://localhost:8003/api/autonomous-ai/status');
+                const data = await response.json();
+                
+                resultsDiv.innerHTML = `
+                    <div style="color: #22c55e;">✅ Backend Connection: OK</div>
+                    <div style="color: #22c55e;">✅ Autonomous AI Status: ${data.status}</div>
+                    <div style="color: #22c55e;">✅ Backend URL: http://localhost:8003</div>
+                    <div style="color: #f59e0b;">⚠️ Frontend Cache: Check if AI widget uses correct endpoints</div>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div style="color: #ef4444;">❌ Backend Connection Failed</div>
+                    <div style="color: #ef4444;">Error: ${error.message}</div>
+                    <div style="color: #f59e0b;">⚠️ Check if backend is running: pm2 status</div>
+                `;
+            }
+        }
+
+        async function checkSystemStatus() {
+            const statusDiv = document.getElementById('systemStatus');
+            statusDiv.innerHTML = 'Checking system status...';
+            
+            try {
+                const response = await fetch('http://localhost:8003/api/autonomous-ai/status');
+                const data = await response.json();
+                
+                statusDiv.innerHTML = `
+                    <div class="test-result success">
+                        <strong>✅ Backend Status: ${data.status}</strong>
+                        <ul>
+                            <li>System: ${data.system_name} v${data.version}</li>
+                            <li>Learning: ${data.self_improvement.enabled ? 'Active' : 'Disabled'}</li>
+                            <li>Success Rate: ${(data.self_improvement.success_rate * 100).toFixed(1)}%</li>
+                            <li>Features: All autonomous features active</li>
+                        </ul>
+                    </div>
+                    <div class="test-result warning">
+                        <strong>⚠️ Frontend Cache Issue</strong>
+                        <p>Backend is working perfectly, but frontend cache needs clearing.</p>
+                        <p><strong>Solution:</strong> Press Ctrl+F5 on http://localhost:3000</p>
+                    </div>
+                `;
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="test-result error">
+                        <strong>❌ Backend Connection Failed</strong>
+                        <p>Error: ${error.message}</p>
+                        <p>Check if backend is running: <code>pm2 status</code></p>
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-check status on page load
+        window.onload = function() {
+            setTimeout(checkSystemStatus, 1000);
+        };
+    </script>
+</body>
+</html>
