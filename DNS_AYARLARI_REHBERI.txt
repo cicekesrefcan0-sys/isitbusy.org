@@ -1,0 +1,48 @@
+# 🌐 DNS AYARLARI REHBERİ - isitbusy.org
+
+## 📋 VERCEL FRONTEND IÇIN DNS KAYITLARI
+
+### Domain Provider'ınızda (Porkbun/Namecheap/Cloudflare) eklenecek kayıtlar:
+
+```
+Type: A
+Name: @ (veya boş)
+Value: 76.76.19.61
+TTL: 300 (veya Auto)
+
+Type: CNAME
+Name: www
+Value: cname.vercel-dns.com
+TTL: 300 (veya Auto)
+```
+
+## 📋 RAILWAY BACKEND IÇIN DNS KAYITLARI
+
+### Domain Provider'ınızda eklenecek kayıt:
+
+```
+Type: CNAME
+Name: api
+Value: [Railway'den alacağınız CNAME değeri]
+TTL: 300 (veya Auto)
+```
+
+## 🎯 SONUÇ:
+- https://isitbusy.org → Vercel Frontend
+- https://www.isitbusy.org → Vercel Frontend  
+- https://api.isitbusy.org → Railway Backend
+
+## ⏰ DNS PROPAGATION:
+- Genellikle 5-10 dakika
+- Maksimum 24 saat sürebilir
+- whatsmydns.net ile kontrol edebilirsiniz
+
+## 🔧 TROUBLESHOOTING:
+- DNS kayıtları doğru girildi mi?
+- TTL değeri çok yüksek mi?
+- Domain provider'da değişiklikler kaydedildi mi?
+
+## 📞 DOMAIN PROVIDER SUPPORT:
+- Porkbun: support@porkbun.com
+- Namecheap: support@namecheap.com
+- Cloudflare: support@cloudflare.com

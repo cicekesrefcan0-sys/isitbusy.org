@@ -1,0 +1,37 @@
+# 🔑 ENVIRONMENT VARIABLES TEMPLATE - isitbusy.org
+
+## 📋 VERCEL FRONTEND ENVIRONMENT VARIABLES
+```
+REACT_APP_API_URL=https://api.isitbusy.org
+REACT_APP_ENVIRONMENT=production
+GENERATE_SOURCEMAP=false
+```
+
+## 📋 RAILWAY BACKEND ENVIRONMENT VARIABLES
+```
+MONGO_URL=mongodb+srv://isitbusy:PASSWORD@isitbusy-cluster.xxxxx.mongodb.net/isitbusy
+GOOGLE_PLACES_API_KEY=your_google_places_api_key_here
+GEMINI_API_KEY=your_gemini_api_key_here
+JWT_SECRET=your_super_secret_jwt_key_here_32_chars_minimum
+CORS_ORIGINS=https://isitbusy.org,https://www.isitbusy.org
+PORT=8000
+ENVIRONMENT=production
+```
+
+## 📝 NOTES:
+- MongoDB PASSWORD: MongoDB Atlas'ta oluşturduğunuz şifre
+- GOOGLE_PLACES_API_KEY: Google Cloud Console'dan alacağınız key
+- GEMINI_API_KEY: Google AI Studio'dan alacağınız key
+- JWT_SECRET: En az 32 karakter, güçlü bir secret key
+
+## 🔗 LINKS:
+- Vercel: https://vercel.com
+- Railway: https://railway.app
+- MongoDB Atlas: https://cloud.mongodb.com
+- Google Cloud Console: https://console.cloud.google.com
+- Google AI Studio: https://makersuite.google.com/app/apikey
+
+## ⚡ QUICK COPY-PASTE:
+JWT_SECRET örneği: isitbusy_super_secret_jwt_key_2024_production_ready_32_chars
+
+CORS_ORIGINS: https://isitbusy.org,https://www.isitbusy.org
