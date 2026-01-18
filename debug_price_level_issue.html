@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Price Level Issue</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .result { background: #2a2a2a; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .error { background: #4a1a1a; border: 1px solid #ff4444; }
+        .success { background: #1a4a1a; border: 1px solid #44ff44; }
+        .warning { background: #4a4a1a; border: 1px solid #ffff44; }
+        pre { white-space: pre-wrap; word-wrap: break-word; font-size: 12px; }
+        button { background: #4a90e2; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #357abd; }
+        .venue-card { background: #333; padding: 10px; margin: 5px 0; border-radius: 5px; }
+        .price-display { font-weight: bold; padding: 5px 10px; border-radius: 5px; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug Price Level Issue</h1>
+        <p>Comprehensive test to find why price level shows "Price varies"</p>
+        
+        <button onclick="runFullDiagnostic()">Run Full Diagnostic</button>
+        <button onclick="clearResults()">Clear Results</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001/api';
+        
+        function addResult(title, content, type = 'success') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<h3>${title}</h3><div>${content}</div>`;
+            results.appendChild(div);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        // Exact same functions from VenuePage.jsx
+        const getPriceText = (priceLevel) => {
+            const priceMap = {
+                0: 'Free',
+                1: '$10-20 per person',
+                2: '$20-40 per person', 
+                3: '$40-80 per person',
+                4: '$80+ per person',
+                'PRICE_LEVEL_FREE': 'Free',
+                'PRICE_LEVEL_INEXPENSIVE': '$10-20 per person',
+                'PRICE_LEVEL_MODERATE': '$20-40 per person',
+                'PRICE_LEVEL_EXPENSIVE': '$40-80 per person',
+                'PRICE_LEVEL_VERY_EXPENSIVE': '$80+ per person'
+            };
+            return priceMap[priceLevel] || 'Price varies';
+        };
+
+        const getPriceColor = (priceLevel) => {
+            const colorMap = {
+                0: '#4ade80', 1: '#4ade80', 2: '#facc15', 3: '#fb923c', 4: '#f87171',
+                'PRICE_LEVEL_FREE': '#4ade80',
+                'PRICE_LEVEL_INEXPENSIVE': '#4ade80',
+                'PRICE_LEVEL_MODERATE': '#facc15',
+                'PRICE_LEVEL_EXPENSIVE': '#fb923c',
+                'PRICE_LEVEL_VERY_EXPENSIVE': '#f87171'
+            };
+            return colorMap[priceLevel] || '#9ca3af';
+        };
+        
+        async function runFullDiagnostic() {
+            addResult('🚀 Starting Full Diagnostic...', 'Testing all aspects of the price level system', 'warning');
+            
+            try {
+                // Test 1: Venue List API
+                const listResponse = await fetch(`${API_BASE}/venues?limit=10`);
+                const listData = await listResponse.json();
+                
+                let listContent = '<strong>Venue List API Results:</strong><br><br>';
+                
+                if (listData.data && listData.data.length > 0) {
+                    let hasPrice = 0;
+                    let noPrice = 0;
+                    let nullPrice = 0;
+                    
+                    listData.data.forEach((venue, i) => {
+                        const priceLevel = venue.price_level;
+                        const priceText = getPriceText(priceLevel);
+                        const priceColor = getPriceColor(priceLevel);
+                        
+                        if (priceLevel === null) nullPrice++;
+                        else if (priceLevel === undefined || priceLevel === '') noPrice++;
+                        else hasPrice++;
+                        
+                        listContent += `<div class="venue-card">`;
+                        listContent += `<strong>${venue.name}</strong><br>`;
+                        listContent += `Raw price_level: "${priceLevel}" (${typeof priceLevel})<br>`;
+                        listContent += `<div class="price-display" style="background: #333; color: ${priceColor}">`;
+                        listContent += `Mapped: ${priceText}`;
+                        listContent += `</div>`;
+                        listContent += `</div>`;
+                    });
+                    
+                    listContent += `<br><strong>Summary:</strong><br>`;
+                    listContent += `✅ Has price_level: ${hasPrice}<br>`;
+                    listContent += `❌ Null price_level: ${nullPrice}<br>`;
+                    listContent += `❌ Missing price_level: ${noPrice}<br>`;
+                    
+                    addResult('📋 Venue List API Test', listContent, hasPrice > 0 ? 'success' : 'error');
+                } else {
+                    addResult('❌ Venue List API Test', 'No venues returned', 'error');
+                    return;
+                }
+                
+                // Test 2: Individual Venue Detail API
+                const testVenue = listData.data[0];
+                const detailResponse = await fetch(`${API_BASE}/venues/${testVenue.id}`);
+                const detailData = await detailResponse.json();
+                
+                let detailContent = `<strong>Venue Detail API for: ${detailData.name}</strong><br><br>`;
+                detailContent += `<strong>Raw API Response Fields:</strong><br>`;
+                detailContent += `<pre>${JSON.stringify({
+                    id: detailData.id,
+                    name: detailData.name,
+                    price_level: detailData.price_level,
+                    rating: detailData.rating,
+                    type: detailData.type
+                }, null, 2)}</pre><br>`;
+                
+                const detailPriceText = getPriceText(detailData.price_level);
+                const detailPriceColor = getPriceColor(detailData.price_level);
+                
+                detailContent += `<div class="price-display" style="background: #333; color: ${detailPriceColor}">`;
+                detailContent += `Final Display: ${detailPriceText}`;
+                detailContent += `</div>`;
+                
+                if (detailPriceText === 'Price varies') {
+                    detailContent += `<br><strong>❌ ISSUE FOUND:</strong> price_level is "${detailData.price_level}" which maps to "Price varies"`;
+                } else {
+                    detailContent += `<br><strong>✅ WORKING:</strong> price_level maps correctly`;
+                }
+                
+                addResult('🔍 Venue Detail API Test', detailContent, detailPriceText !== 'Price varies' ? 'success' : 'error');
+                
+                // Test 3: Frontend Simulation
+                let frontendContent = '<strong>Frontend VenuePage.jsx Simulation:</strong><br><br>';
+                
+                // Simulate the exact code from VenuePage.jsx
+                const venue = detailData;
+                const venueDetails = null; // This would be from /venues/{id}/details endpoint
+                
+                frontendContent += `<strong>VenuePage.jsx Price Section Code:</strong><br>`;
+                frontendContent += `<code>venue.price_level = "${venue.price_level}"</code><br>`;
+                frontendContent += `<code>getPriceText(venue.price_level) = "${getPriceText(venue.price_level)}"</code><br>`;
+                frontendContent += `<code>getPriceColor(venue.price_level) = "${getPriceColor(venue.price_level)}"</code><br><br>`;
+                
+                frontendContent += `<strong>Rendered HTML would be:</strong><br>`;
+                frontendContent += `<div style="background: #2a2a2a; padding: 10px; border-radius: 5px; margin: 10px 0;">`;
+                frontendContent += `<p style="color: #9ca3af; font-size: 12px; margin: 0;">PRICE LEVEL</p>`;
+                frontendContent += `<p style="color: ${getPriceColor(venue.price_level)}; font-weight: bold; font-size: 18px; margin: 5px 0;">`;
+                frontendContent += `${getPriceText(venue.price_level)}`;
+                frontendContent += `</p>`;
+                frontendContent += `<p style="color: #9ca3af; font-size: 12px; margin: 0;">Per person cost estimate</p>`;
+                frontendContent += `</div>`;
+                
+                addResult('🎯 Frontend Simulation', frontendContent);
+                
+                // Test 4: Check if issue is browser cache
+                let cacheContent = '<strong>Browser Cache Check:</strong><br><br>';
+                cacheContent += `Current timestamp: ${new Date().toISOString()}<br>`;
+                cacheContent += `API call made at: ${new Date().toLocaleTimeString()}<br><br>`;
+                cacheContent += `<strong>Recommendations:</strong><br>`;
+                cacheContent += `1. Press Ctrl+Shift+R to hard refresh<br>`;
+                cacheContent += `2. Open DevTools → Network tab → check API responses<br>`;
+                cacheContent += `3. Clear browser cache completely<br>`;
+                cacheContent += `4. Try incognito/private browsing mode<br>`;
+                
+                addResult('🔄 Cache Check', cacheContent, 'warning');
+                
+            } catch (error) {
+                addResult('❌ Diagnostic Error', error.message, 'error');
+            }
+        }
+        
+        // Auto-run diagnostic
+        window.onload = function() {
+            setTimeout(runFullDiagnostic, 500);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-01-18T04:16:15.452606",
+  "test_type": "automatic_eventbrite_updates",
+  "scheduler_active": true,
+  "daily_update_time": "06:00 Mountain Time",
+  "refresh_times": [
+    "00:30",
+    "12:30",
+    "18:30"
+  ],
+  "cleanup_enabled": true,
+  "real_venues": true,
+  "after_party_detection": true,
+  "colorado_cities": 8
+}

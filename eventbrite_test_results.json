@@ -1,0 +1,68 @@
+{
+  "timestamp": "2026-01-18T03:58:59.228822",
+  "test_results": {
+    "stats": {
+      "cities_searched": 8,
+      "total_events_found": 24,
+      "regular_events": 16,
+      "after_parties": 8,
+      "events_saved": 24,
+      "errors": 0
+    },
+    "regular_events": 5,
+    "after_parties": 5
+  },
+  "scrape_stats": {
+    "cities_searched": 8,
+    "total_events_found": 24,
+    "regular_events": 16,
+    "after_parties": 8,
+    "events_saved": 24,
+    "errors": 0
+  },
+  "regular_events_count": 10,
+  "after_parties_count": 8,
+  "total_events_count": 16,
+  "sample_regular_event": {
+    "id": "eb_demo_event_1_denver",
+    "title": "Denver Music Festival - Denver",
+    "description": "Amazing music festival with local and international artists",
+    "venue": "Denver Convention Center",
+    "city": "Denver",
+    "state": "Colorado",
+    "start_time": "2026-01-23T03:58:51.107074",
+    "end_time": "2026-01-23T09:58:51.107074",
+    "category": "events",
+    "is_after_party": false,
+    "is_free": false,
+    "price_info": "Paid",
+    "url": "https://eventbrite.com/demo-event-1",
+    "image_url": "https://via.placeholder.com/300x200",
+    "organizer": "Demo Organizer",
+    "source": "eventbrite",
+    "source_city": "Denver",
+    "created_at": "2026-01-18T10:58:51.107124+00:00",
+    "updated_at": "2026-01-18T10:58:51.107130+00:00"
+  },
+  "sample_after_party": {
+    "id": "eb_demo_afterparty_1_denver",
+    "title": "After Party - Music Festival Celebration",
+    "description": "Join us for the official after party with DJ sets and drinks",
+    "venue": "Denver Nightclub",
+    "city": "Denver",
+    "state": "Colorado",
+    "start_time": "2026-01-23T13:58:51.107074",
+    "end_time": "2026-01-24T05:58:51.107074",
+    "category": "after_party",
+    "is_after_party": true,
+    "is_free": false,
+    "price_info": "Paid",
+    "url": "https://eventbrite.com/demo-afterparty-1",
+    "image_url": "https://via.placeholder.com/300x200",
+    "organizer": "Demo Organizer",
+    "source": "eventbrite",
+    "source_city": "Denver",
+    "created_at": "2026-01-18T10:58:51.107140+00:00",
+    "updated_at": "2026-01-18T10:58:51.107142+00:00"
+  }
+}

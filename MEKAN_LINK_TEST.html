@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mekan Link Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .test-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        .venue-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .venue-card:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .venue-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        .venue-address {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        .venue-id {
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-top: 10px;
+            font-family: monospace;
+        }
+        .test-result {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .error {
+            border-left-color: #f44336;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #fff;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.success { background: #4CAF50; }
+        .status.error { background: #f44336; }
+        .status.warning { background: #ff9800; }
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔗 Mekan Link Test Sayfası</h1>
+        <p>Bu sayfa tüm mekan linklerinin doğru çalıştığını test eder.</p>
+        
+        <button class="btn" onclick="testAllLinks()">🚀 Tüm Linkleri Test Et</button>
+        <button class="btn" onclick="loadVenues()">📍 Mekanları Yükle</button>
+        <button class="btn" onclick="testFrontend()">🌐 Frontend Test</button>
+        
+        <div id="results"></div>
+        <div id="venues"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001/api';
+        const FRONTEND_BASE = 'http://localhost:3000';
+
+        async function testAllLinks() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Tüm linkler test ediliyor...</div>';
+            
+            try {
+                // 1. Backend API Test
+                const backendTest = await testBackendAPI();
+                
+                // 2. Frontend Test
+                const frontendTest = await testFrontendAccess();
+                
+                // 3. Venue Links Test
+                const venueLinksTest = await testVenueLinks();
+                
+                // 4. Navigation Test
+                const navigationTest = await testNavigation();
+                
+                const allResults = {
+                    backend: backendTest,
+                    frontend: frontendTest,
+                    venueLinks: venueLinksTest,
+                    navigation: navigationTest
+                };
+                
+                displayResults(allResults);
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="test-result error">❌ Test hatası: ${error.message}</div>`;
+            }
+        }
+
+        async function testBackendAPI() {
+            const tests = [
+                { name: 'Health Check', url: `${API_BASE}/health` },
+                { name: 'Venues List', url: `${API_BASE}/venues` },
+                { name: 'Trending Venues', url: `${API_BASE}/trending/venues` },
+                { name: 'Analytics', url: `${API_BASE}/analytics` },
+                { name: 'Search', url: `${API_BASE}/search/venues?q=church` },
+                { name: 'Eventbrite Events', url: `${API_BASE}/eventbrite/events` },
+                { name: 'After Parties', url: `${API_BASE}/eventbrite/after-parties` }
+            ];
+            
+            const results = [];
+            
+            for (const test of tests) {
+                try {
+                    const response = await fetch(test.url);
+                    results.push({
+                        name: test.name,
+                        status: response.status,
+                        success: response.ok,
+                        url: test.url
+                    });
+                } catch (error) {
+                    results.push({
+                        name: test.name,
+                        status: 'ERROR',
+                        success: false,
+                        error: error.message,
+                        url: test.url
+                    });
+                }
+            }
+            
+            return results;
+        }
+
+        async function testFrontendAccess() {
+            try {
+                const response = await fetch(FRONTEND_BASE);
+                return {
+                    success: response.ok,
+                    status: response.status,
+                    url: FRONTEND_BASE
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    error: error.message,
+                    url: FRONTEND_BASE
+                };
+            }
+        }
+
+        async function testVenueLinks() {
+            try {
+                const response = await fetch(`${API_BASE}/venues?limit=5`);
+                if (!response.ok) throw new Error('Venues API failed');
+                
+                const data = await response.json();
+                const venues = data.venues || data;
+                
+                const linkTests = [];
+                
+                for (const venue of venues.slice(0, 3)) {
+                    const venueId = venue.id || venue._id;
+                    const detailUrl = `${API_BASE}/venues/${venueId}`;
+                    
+                    try {
+                        const detailResponse = await fetch(detailUrl);
+                        linkTests.push({
+                            name: venue.name,
+                            id: venueId,
+                            success: detailResponse.ok,
+                            status: detailResponse.status,
+                            url: detailUrl,
+                            frontendUrl: `${FRONTEND_BASE}/venue/${venueId}`
+                        });
+                    } catch (error) {
+                        linkTests.push({
+                            name: venue.name,
+                            id: venueId,
+                            success: false,
+                            error: error.message,
+                            url: detailUrl
+                        });
+                    }
+                }
+                
+                return linkTests;
+            } catch (error) {
+                return { error: error.message };
+            }
+        }
+
+        async function testNavigation() {
+            // Test frontend routing
+            const routes = [
+                { name: 'Ana Sayfa', path: '/' },
+                { name: 'Events', path: '/events' },
+                { name: 'After Party', path: '/after-party' },
+                { name: 'Trending', path: '/trending' }
+            ];
+            
+            const results = [];
+            
+            for (const route of routes) {
+                const fullUrl = `${FRONTEND_BASE}${route.path}`;
+                try {
+                    const response = await fetch(fullUrl);
+                    results.push({
+                        name: route.name,
+                        path: route.path,
+                        success: response.ok,
+                        status: response.status,
+                        url: fullUrl
+                    });
+                } catch (error) {
+                    results.push({
+                        name: route.name,
+                        path: route.path,
+                        success: false,
+                        error: error.message,
+                        url: fullUrl
+                    });
+                }
+            }
+            
+            return results;
+        }
+
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('results');
+            let html = '<h2>🔍 Test Sonuçları</h2>';
+            
+            // Backend API Results
+            html += '<h3>🔧 Backend API Testleri</h3>';
+            results.backend.forEach(test => {
+                const statusClass = test.success ? 'success' : 'error';
+                html += `
+                    <div class="test-result">
+                        <strong>${test.name}</strong>
+                        <span class="status ${statusClass}">${test.success ? '✅ BAŞARILI' : '❌ HATA'}</span>
+                        <br>
+                        <small>Status: ${test.status} | URL: ${test.url}</small>
+                        ${test.error ? `<br><small style="color: #ff6b6b;">Hata: ${test.error}</small>` : ''}
+                    </div>
+                `;
+            });
+            
+            // Frontend Access
+            html += '<h3>🌐 Frontend Erişim</h3>';
+            const frontendClass = results.frontend.success ? 'success' : 'error';
+            html += `
+                <div class="test-result">
+                    <strong>Frontend Erişim</strong>
+                    <span class="status ${frontendClass}">${results.frontend.success ? '✅ BAŞARILI' : '❌ HATA'}</span>
+                    <br>
+                    <small>URL: ${results.frontend.url}</small>
+                    ${results.frontend.error ? `<br><small style="color: #ff6b6b;">Hata: ${results.frontend.error}</small>` : ''}
+                </div>
+            `;
+            
+            // Venue Links
+            html += '<h3>🏢 Mekan Link Testleri</h3>';
+            if (results.venueLinks.error) {
+                html += `<div class="test-result error">❌ Venue links test hatası: ${results.venueLinks.error}</div>`;
+            } else {
+                results.venueLinks.forEach(test => {
+                    const statusClass = test.success ? 'success' : 'error';
+                    html += `
+                        <div class="test-result">
+                            <strong>${test.name}</strong>
+                            <span class="status ${statusClass}">${test.success ? '✅ BAŞARILI' : '❌ HATA'}</span>
+                            <br>
+                            <small>ID: ${test.id}</small><br>
+                            <small>API: ${test.url}</small><br>
+                            <small>Frontend: <a href="${test.frontendUrl}" target="_blank" style="color: #4CAF50;">${test.frontendUrl}</a></small>
+                            ${test.error ? `<br><small style="color: #ff6b6b;">Hata: ${test.error}</small>` : ''}
+                        </div>
+                    `;
+                });
+            }
+            
+            // Navigation Tests
+            html += '<h3>🧭 Navigasyon Testleri</h3>';
+            results.navigation.forEach(test => {
+                const statusClass = test.success ? 'success' : 'error';
+                html += `
+                    <div class="test-result">
+                        <strong>${test.name}</strong>
+                        <span class="status ${statusClass}">${test.success ? '✅ BAŞARILI' : '❌ HATA'}</span>
+                        <br>
+                        <small>Path: ${test.path} | URL: <a href="${test.url}" target="_blank" style="color: #4CAF50;">${test.url}</a></small>
+                        ${test.error ? `<br><small style="color: #ff6b6b;">Hata: ${test.error}</small>` : ''}
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        async function loadVenues() {
+            const venuesDiv = document.getElementById('venues');
+            venuesDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Mekanlar yükleniyor...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/venues?limit=10`);
+                if (!response.ok) throw new Error('Venues API failed');
+                
+                const data = await response.json();
+                const venues = data.venues || data;
+                
+                let html = '<h2>📍 Test Mekanları</h2>';
+                
+                venues.forEach(venue => {
+                    const venueId = venue.id || venue._id;
+                    const frontendUrl = `${FRONTEND_BASE}/venue/${venueId}`;
+                    
+                    html += `
+                        <div class="venue-card" onclick="testVenueLink('${venueId}', '${venue.name}')">
+                            <div class="venue-name">${venue.name}</div>
+                            <div class="venue-address">${venue.address || 'Adres bilgisi yok'}</div>
+                            <div class="venue-id">ID: ${venueId}</div>
+                            <div style="margin-top: 10px;">
+                                <small>Frontend URL: <a href="${frontendUrl}" target="_blank" style="color: #4CAF50;">${frontendUrl}</a></small>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                venuesDiv.innerHTML = html;
+                
+            } catch (error) {
+                venuesDiv.innerHTML = `<div class="test-result error">❌ Mekanlar yüklenemedi: ${error.message}</div>`;
+            }
+        }
+
+        async function testVenueLink(venueId, venueName) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `<div class="loading"><div class="spinner"></div>${venueName} linki test ediliyor...</div>`;
+            
+            try {
+                // Test API endpoint
+                const apiUrl = `${API_BASE}/venues/${venueId}`;
+                const apiResponse = await fetch(apiUrl);
+                
+                // Test frontend URL
+                const frontendUrl = `${FRONTEND_BASE}/venue/${venueId}`;
+                const frontendResponse = await fetch(frontendUrl);
+                
+                const result = {
+                    venueName,
+                    venueId,
+                    api: {
+                        url: apiUrl,
+                        success: apiResponse.ok,
+                        status: apiResponse.status
+                    },
+                    frontend: {
+                        url: frontendUrl,
+                        success: frontendResponse.ok,
+                        status: frontendResponse.status
+                    }
+                };
+                
+                let html = `<h2>🔍 ${venueName} Link Test Sonucu</h2>`;
+                
+                const apiClass = result.api.success ? 'success' : 'error';
+                const frontendClass = result.frontend.success ? 'success' : 'error';
+                
+                html += `
+                    <div class="test-result">
+                        <strong>API Endpoint</strong>
+                        <span class="status ${apiClass}">${result.api.success ? '✅ BAŞARILI' : '❌ HATA'}</span>
+                        <br>
+                        <small>URL: ${result.api.url}</small><br>
+                        <small>Status: ${result.api.status}</small>
+                    </div>
+                    
+                    <div class="test-result">
+                        <strong>Frontend URL</strong>
+                        <span class="status ${frontendClass}">${result.frontend.success ? '✅ BAŞARILI' : '❌ HATA'}</span>
+                        <br>
+                        <small>URL: <a href="${result.frontend.url}" target="_blank" style="color: #4CAF50;">${result.frontend.url}</a></small><br>
+                        <small>Status: ${result.frontend.status}</small>
+                    </div>
+                `;
+                
+                resultsDiv.innerHTML = html;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="test-result error">❌ Link test hatası: ${error.message}</div>`;
+            }
+        }
+
+        async function testFrontend() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Frontend test ediliyor...</div>';
+            
+            try {
+                const response = await fetch(FRONTEND_BASE);
+                const success = response.ok;
+                
+                let html = `<h2>🌐 Frontend Test Sonucu</h2>`;
+                const statusClass = success ? 'success' : 'error';
+                
+                html += `
+                    <div class="test-result">
+                        <strong>Frontend Erişim</strong>
+                        <span class="status ${statusClass}">${success ? '✅ BAŞARILI' : '❌ HATA'}</span>
+                        <br>
+                        <small>URL: <a href="${FRONTEND_BASE}" target="_blank" style="color: #4CAF50;">${FRONTEND_BASE}</a></small><br>
+                        <small>Status: ${response.status}</small>
+                    </div>
+                `;
+                
+                if (success) {
+                    html += `
+                        <div class="test-result">
+                            <strong>✅ Frontend Hazır!</strong><br>
+                            <small>Şimdi frontend'e gidip mekan linklerini test edebilirsiniz.</small><br>
+                            <button class="btn" onclick="window.open('${FRONTEND_BASE}', '_blank')">🚀 Frontend'i Aç</button>
+                        </div>
+                    `;
+                }
+                
+                resultsDiv.innerHTML = html;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="test-result error">❌ Frontend test hatası: ${error.message}</div>`;
+            }
+        }
+
+        // Sayfa yüklendiğinde otomatik test başlat
+        window.onload = function() {
+            loadVenues();
+        };
+    </script>
+</body>
+</html>

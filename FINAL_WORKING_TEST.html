@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ Final Working Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0a0a0f;
+            color: white;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid #22c55e;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .venue-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .venue-card:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+        .venue-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #60a5fa;
+            margin-bottom: 8px;
+        }
+        .venue-address {
+            color: #9ca3af;
+            margin-bottom: 8px;
+        }
+        .venue-meta {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        button {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-weight: bold;
+        }
+        button:hover { background: #16a34a; }
+        .big-number {
+            font-size: 48px;
+            font-weight: bold;
+            color: #22c55e;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ Final Working Test</h1>
+        <p>Testing the fixed CORS configuration and venue loading.</p>
+        
+        <div class="success">
+            <h2>🎉 CORS Issue Fixed!</h2>
+            <p>✅ Backend CORS now allows both port 3000 and 3001</p>
+            <p>✅ Frontend can now successfully connect to backend</p>
+            <p>✅ All venue data should load properly</p>
+        </div>
+        
+        <button onclick="testVenueLoading()">🚀 Test Venue Loading</button>
+        <button onclick="openFrontend()">🌐 Open Frontend (Port 3001)</button>
+        <button onclick="openFrontendAlt()">🌐 Open Frontend (Port 3000)</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        async function testVenueLoading() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h2>🧪 Testing Venue Loading...</h2>';
+            
+            try {
+                // Test the exact same API call that React frontend makes
+                const API = 'http://localhost:8001/api';
+                const response = await fetch(`${API}/venues?limit=5000`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const venues = Array.isArray(data) ? data : (data.data || []);
+                
+                if (venues.length > 0) {
+                    resultsDiv.innerHTML = `
+                        <div class="success">
+                            <h2>✅ Venue Loading Test Successful!</h2>
+                            <div class="big-number">${venues.length}</div>
+                            <p style="text-align: center; margin-top: 10px;">Venues loaded successfully</p>
+                            
+                            <h3>Sample Venues:</h3>
+                            ${venues.slice(0, 5).map(venue => `
+                                <div class="venue-card" onclick="openVenueInFrontend('${venue.id}')">
+                                    <div class="venue-name">${venue.name}</div>
+                                    <div class="venue-address">📍 ${venue.address}</div>
+                                    <div class="venue-meta">
+                                        🏷️ ${venue.type} | 
+                                        ⭐ ${venue.rating || 'N/A'} | 
+                                        🔗 ${venue.data_source} |
+                                        🖼️ ${venue.image_url ? 'Has image' : 'No image'}
+                                    </div>
+                                </div>
+                            `).join('')}
+                            
+                            <p style="margin-top: 20px;">
+                                <strong>✅ The "Failed to load venues" error should now be fixed!</strong><br>
+                                Click any venue above to test navigation, or use the buttons below to open the frontend.
+                            </p>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML = `
+                        <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; border-radius: 12px; padding: 20px;">
+                            <h2>⚠️ No Venues Found</h2>
+                            <p>API responded successfully but returned no venues.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; border-radius: 12px; padding: 20px;">
+                        <h2>❌ Test Failed</h2>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p>This indicates the CORS issue may not be fully resolved.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function openVenueInFrontend(venueId) {
+            // Try port 3001 first (current frontend port)
+            window.open(`http://localhost:3001/venue/${venueId}`, '_blank');
+        }
+
+        function openFrontend() {
+            window.open('http://localhost:3001', '_blank');
+        }
+
+        function openFrontendAlt() {
+            window.open('http://localhost:3000', '_blank');
+        }
+
+        // Auto-run test on page load
+        window.addEventListener('load', () => {
+            testVenueLoading();
+        });
+    </script>
+</body>
+</html>

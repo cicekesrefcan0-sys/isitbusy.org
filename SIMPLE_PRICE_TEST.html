@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Price Level Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .result { background: #2a2a2a; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .success { background: #1a4a1a; border: 1px solid #44ff44; }
+        .warning { background: #4a4a1a; border: 1px solid #ffff44; }
+        .test-case { background: #333; padding: 10px; margin: 5px 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .price-display { font-weight: bold; padding: 5px 10px; border-radius: 5px; }
+        button { background: #4a90e2; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #357abd; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ Simple Price Level Test</h1>
+        <p>Testing the improved price level functions directly (no API calls needed)</p>
+        
+        <button onclick="testPriceFunctions()">Test Price Functions</button>
+        <button onclick="testRealScenarios()">Test Real Scenarios</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function addResult(title, content, type = 'success') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<h3>${title}</h3><div>${content}</div>`;
+            results.appendChild(div);
+        }
+        
+        // Updated price functions (same as in the fixed frontend)
+        const getPriceText = (priceLevel, venueType) => {
+            const priceMap = {
+                0: 'Free', 1: '$10-20 per person', 2: '$20-40 per person', 3: '$40-80 per person', 4: '$80+ per person',
+                'PRICE_LEVEL_FREE': 'Free', 'PRICE_LEVEL_INEXPENSIVE': '$10-20 per person',
+                'PRICE_LEVEL_MODERATE': '$20-40 per person', 'PRICE_LEVEL_EXPENSIVE': '$40-80 per person',
+                'PRICE_LEVEL_VERY_EXPENSIVE': '$80+ per person'
+            };
+            
+            if (priceLevel !== null && priceLevel !== undefined && priceLevel !== '') {
+                return priceMap[priceLevel] || 'Price varies';
+            }
+            
+            const typeBasedEstimates = {
+                'bar': '$15-30 per person', 'nightclub': '$20-50 per person', 'restaurant': '$20-40 per person',
+                'cafe': '$10-20 per person', 'fast_food': '$8-15 per person', 'brewery': '$15-35 per person',
+                'wine_bar': '$25-45 per person', 'cocktail_bar': '$20-40 per person', 'sports_bar': '$15-30 per person'
+            };
+            
+            return typeBasedEstimates[venueType] || '$15-35 per person';
+        };
+
+        const getPriceColor = (priceLevel, venueType) => {
+            const colorMap = {
+                0: '#4ade80', 1: '#4ade80', 2: '#facc15', 3: '#fb923c', 4: '#f87171',
+                'PRICE_LEVEL_FREE': '#4ade80', 'PRICE_LEVEL_INEXPENSIVE': '#4ade80',
+                'PRICE_LEVEL_MODERATE': '#facc15', 'PRICE_LEVEL_EXPENSIVE': '#fb923c',
+                'PRICE_LEVEL_VERY_EXPENSIVE': '#f87171'
+            };
+            
+            if (priceLevel !== null && priceLevel !== undefined && priceLevel !== '') {
+                return colorMap[priceLevel] || '#facc15';
+            }
+            
+            return '#facc15';
+        };
+        
+        function testPriceFunctions() {
+            const testCases = [
+                // Valid Google Places price levels
+                { priceLevel: 'PRICE_LEVEL_MODERATE', venueType: 'bar', description: 'Google Places Moderate' },
+                { priceLevel: 'PRICE_LEVEL_INEXPENSIVE', venueType: 'cafe', description: 'Google Places Inexpensive' },
+                { priceLevel: 2, venueType: 'restaurant', description: 'Numeric price level 2' },
+                
+                // Missing price levels (should use intelligent fallbacks)
+                { priceLevel: null, venueType: 'bar', description: 'Null price level - Bar' },
+                { priceLevel: undefined, venueType: 'nightclub', description: 'Undefined price level - Nightclub' },
+                { priceLevel: '', venueType: 'restaurant', description: 'Empty price level - Restaurant' },
+                { priceLevel: null, venueType: 'unknown_type', description: 'Null price level - Unknown type' }
+            ];
+            
+            let content = '';
+            let successCount = 0;
+            
+            testCases.forEach((test, i) => {
+                const result = getPriceText(test.priceLevel, test.venueType);
+                const color = getPriceColor(test.priceLevel, test.venueType);
+                const isSuccess = result !== 'Price varies';
+                
+                if (isSuccess) successCount++;
+                
+                content += `<div class="test-case">`;
+                content += `<div>`;
+                content += `<strong>${test.description}</strong><br>`;
+                content += `Type: ${test.venueType}, Price Level: "${test.priceLevel}"`;
+                content += `</div>`;
+                content += `<div class="price-display" style="background: #333; color: ${color}">`;
+                content += `${result} ${isSuccess ? '✅' : '❌'}`;
+                content += `</div>`;
+                content += `</div>`;
+            });
+            
+            content += `<br><strong>Results: ${successCount}/${testCases.length} tests show meaningful prices (no "Price varies")</strong>`;
+            
+            if (successCount === testCases.length) {
+                content += `<br><br>🎉 <strong>PERFECT!</strong> All test cases now show meaningful price information!`;
+            }
+            
+            addResult('🧪 Price Function Tests', content, successCount === testCases.length ? 'success' : 'warning');
+        }
+        
+        function testRealScenarios() {
+            // Simulate real venue data scenarios
+            const realScenarios = [
+                { name: 'The Grizzly Rose', type: 'bar', price_level: null },
+                { name: 'Red Rocks Bar & Grill', type: 'restaurant', price_level: 'PRICE_LEVEL_MODERATE' },
+                { name: 'Denver Nightclub', type: 'nightclub', price_level: undefined },
+                { name: 'Local Coffee Shop', type: 'cafe', price_level: '' },
+                { name: 'Sports Bar Downtown', type: 'sports_bar', price_level: 'PRICE_LEVEL_INEXPENSIVE' },
+                { name: 'Fancy Wine Bar', type: 'wine_bar', price_level: null }
+            ];
+            
+            let content = '<strong>Real Venue Scenarios:</strong><br><br>';
+            let allFixed = true;
+            
+            realScenarios.forEach(venue => {
+                const priceText = getPriceText(venue.price_level, venue.type);
+                const priceColor = getPriceColor(venue.price_level, venue.type);
+                const isFixed = priceText !== 'Price varies';
+                
+                if (!isFixed) allFixed = false;
+                
+                content += `<div class="test-case">`;
+                content += `<div>`;
+                content += `<strong>${venue.name}</strong><br>`;
+                content += `Type: ${venue.type}<br>`;
+                content += `Raw price_level: "${venue.price_level}"`;
+                content += `</div>`;
+                content += `<div class="price-display" style="background: #333; color: ${priceColor}">`;
+                content += `${priceText} ${isFixed ? '✅' : '❌'}`;
+                content += `</div>`;
+                content += `</div>`;
+            });
+            
+            if (allFixed) {
+                content += `<br><br>🎉 <strong>SUCCESS!</strong> All venues now show meaningful price information!`;
+                content += `<br><br><strong>What this means for users:</strong>`;
+                content += `<ul>`;
+                content += `<li>✅ No more confusing "Price varies" messages</li>`;
+                content += `<li>✅ Every venue shows a helpful price estimate</li>`;
+                content += `<li>✅ Estimates are tailored to venue type (bars vs restaurants vs cafes)</li>`;
+                content += `<li>✅ Users can make informed decisions about where to go</li>`;
+                content += `</ul>`;
+            }
+            
+            addResult('🏢 Real Venue Scenarios', content, allFixed ? 'success' : 'warning');
+        }
+        
+        // Auto-run tests
+        window.onload = function() {
+            setTimeout(() => {
+                testPriceFunctions();
+                setTimeout(testRealScenarios, 1000);
+            }, 500);
+        };
+    </script>
+</body>
+</html>

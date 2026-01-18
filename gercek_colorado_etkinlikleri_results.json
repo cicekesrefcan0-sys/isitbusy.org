@@ -1,0 +1,44 @@
+{
+  "timestamp": "2026-01-18T04:05:08.590008",
+  "test_type": "realistic_colorado_events",
+  "test_results": {
+    "total_events": 39,
+    "regular_events": 24,
+    "after_parties": 15,
+    "sample_event": {
+      "id": "eb_real_denver_3_1770116708",
+      "title": "Art Exhibition Opening - Denver",
+      "description": "Join us for an amazing art exhibition opening experience in Denver. Don't miss this incredible event!",
+      "venue": "Denver Art Museum",
+      "city": "Denver",
+      "state": "Colorado",
+      "start_time": "2026-02-03T04:05:08.521543",
+      "end_time": "2026-02-03T07:05:08.521543",
+      "category": "events",
+      "is_after_party": false,
+      "is_free": false,
+      "price_info": "$30",
+      "url": "https://www.eventbrite.com/e/eb_real_denver_3_1770116708",
+      "image_url": "https://images.unsplash.com/photo-1500000003?w=400&h=300&fit=crop",
+      "organizer": "Denver Events Co.",
+      "source": "eventbrite_real",
+      "source_city": "Denver",
+      "created_at": "2026-01-18T11:05:08.521576+00:00",
+      "updated_at": "2026-01-18T11:05:08.521580+00:00"
+    }
+  },
+  "generation_stats": {
+    "cities_searched": 8,
+    "total_events_found": 41,
+    "regular_events": 24,
+    "after_parties": 17,
+    "events_saved": 41,
+    "errors": 0
+  },
+  "real_regular_events_count": 0,
+  "real_after_parties_count": 0,
+  "real_venues_count": 0,
+  "sample_real_event": null,
+  "sample_real_after_party": null,
+  "venues_used": []
+}

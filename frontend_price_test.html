@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Frontend Price Level Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .result { background: #2a2a2a; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .error { background: #4a1a1a; border: 1px solid #ff4444; }
+        .success { background: #1a4a1a; border: 1px solid #44ff44; }
+        .warning { background: #4a4a1a; border: 1px solid #ffff44; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+        button { background: #4a90e2; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #357abd; }
+        .price-test { display: flex; gap: 10px; align-items: center; margin: 5px 0; }
+        .price-result { padding: 5px 10px; border-radius: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Frontend Price Level Test</h1>
+        <p>Testing the exact same price mapping logic used in VenuePage.jsx</p>
+        
+        <button onclick="testFrontendAPI()">Test Frontend API Call</button>
+        <button onclick="testPriceMappingLogic()">Test Price Mapping Logic</button>
+        <button onclick="clearResults()">Clear Results</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001/api';
+        
+        function addResult(title, content, type = 'success') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `<h3>${title}</h3><div>${content}</div>`;
+            results.appendChild(div);
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        // Exact same functions from VenuePage.jsx
+        const getPriceText = (priceLevel) => {
+            // Handle both numeric (0-4) and string formats from Google Places API
+            const priceMap = {
+                // Numeric format
+                0: 'Free',
+                1: '$10-20 per person',
+                2: '$20-40 per person', 
+                3: '$40-80 per person',
+                4: '$80+ per person',
+                // Google Places API string format
+                'PRICE_LEVEL_FREE': 'Free',
+                'PRICE_LEVEL_INEXPENSIVE': '$10-20 per person',
+                'PRICE_LEVEL_MODERATE': '$20-40 per person',
+                'PRICE_LEVEL_EXPENSIVE': '$40-80 per person',
+                'PRICE_LEVEL_VERY_EXPENSIVE': '$80+ per person'
+            };
+            return priceMap[priceLevel] || 'Price varies';
+        };
+
+        const getPriceColor = (priceLevel) => {
+            // Handle both numeric (0-4) and string formats from Google Places API
+            const colorMap = {
+                // Numeric format
+                0: 'text-green-400',
+                1: 'text-green-400',
+                2: 'text-yellow-400',
+                3: 'text-orange-400',
+                4: 'text-red-400',
+                // Google Places API string format
+                'PRICE_LEVEL_FREE': 'text-green-400',
+                'PRICE_LEVEL_INEXPENSIVE': 'text-green-400',
+                'PRICE_LEVEL_MODERATE': 'text-yellow-400',
+                'PRICE_LEVEL_EXPENSIVE': 'text-orange-400',
+                'PRICE_LEVEL_VERY_EXPENSIVE': 'text-red-400'
+            };
+            return colorMap[priceLevel] || 'text-gray-400';
+        };
+        
+        async function testFrontendAPI() {
+            try {
+                // Test venue list first
+                const listResponse = await fetch(`${API_BASE}/venues?limit=3`);
+                const listData = await listResponse.json();
+                
+                if (listData.data && listData.data.length > 0) {
+                    const venue = listData.data[0];
+                    
+                    let content = `<strong>Venue List API Test:</strong><br>`;
+                    content += `Venue: ${venue.name}<br>`;
+                    content += `Raw price_level: "${venue.price_level}" (${typeof venue.price_level})<br>`;
+                    content += `Mapped text: "${getPriceText(venue.price_level)}"<br>`;
+                    content += `Color class: "${getPriceColor(venue.price_level)}"<br><br>`;
+                    
+                    // Test venue detail
+                    const detailResponse = await fetch(`${API_BASE}/venues/${venue.id}`);
+                    const detailData = await detailResponse.json();
+                    
+                    content += `<strong>Venue Detail API Test:</strong><br>`;
+                    content += `Venue: ${detailData.name}<br>`;
+                    content += `Raw price_level: "${detailData.price_level}" (${typeof detailData.price_level})<br>`;
+                    content += `Mapped text: "${getPriceText(detailData.price_level)}"<br>`;
+                    content += `Color class: "${getPriceColor(detailData.price_level)}"<br><br>`;
+                    
+                    // Visual test
+                    const priceText = getPriceText(detailData.price_level);
+                    const colorClass = getPriceColor(detailData.price_level);
+                    
+                    content += `<div class="price-test">`;
+                    content += `<strong>Visual Result:</strong>`;
+                    content += `<span class="price-result" style="background: #333; color: ${colorClass.includes('green') ? '#4ade80' : colorClass.includes('yellow') ? '#facc15' : colorClass.includes('orange') ? '#fb923c' : colorClass.includes('red') ? '#f87171' : '#9ca3af'}">${priceText}</span>`;
+                    content += `</div>`;
+                    
+                    if (priceText === 'Price varies') {
+                        addResult('❌ Frontend API Test - Still showing "Price varies"', content, 'error');
+                    } else {
+                        addResult('✅ Frontend API Test - Price mapping works!', content, 'success');
+                    }
+                } else {
+                    addResult('❌ Frontend API Test', 'No venues returned from API', 'error');
+                }
+            } catch (error) {
+                addResult('❌ Frontend API Test Error', error.message, 'error');
+            }
+        }
+        
+        function testPriceMappingLogic() {
+            const testValues = [
+                null, undefined, '', 'PRICE_LEVEL_MODERATE', 'PRICE_LEVEL_INEXPENSIVE', 
+                'PRICE_LEVEL_EXPENSIVE', 'PRICE_LEVEL_FREE', 'PRICE_LEVEL_VERY_EXPENSIVE',
+                0, 1, 2, 3, 4, 'invalid_value'
+            ];
+            
+            let content = '<strong>Price Mapping Logic Test:</strong><br><br>';
+            
+            testValues.forEach(value => {
+                const text = getPriceText(value);
+                const color = getPriceColor(value);
+                const colorStyle = color.includes('green') ? '#4ade80' : 
+                                 color.includes('yellow') ? '#facc15' : 
+                                 color.includes('orange') ? '#fb923c' : 
+                                 color.includes('red') ? '#f87171' : '#9ca3af';
+                
+                content += `<div class="price-test">`;
+                content += `<code>"${value}" (${typeof value})</code> → `;
+                content += `<span class="price-result" style="background: #333; color: ${colorStyle}">${text}</span>`;
+                content += `</div>`;
+            });
+            
+            addResult('🧪 Price Mapping Logic Test', content);
+        }
+        
+        // Auto-run tests
+        window.onload = function() {
+            setTimeout(testFrontendAPI, 500);
+        };
+    </script>
+</body>
+</html>

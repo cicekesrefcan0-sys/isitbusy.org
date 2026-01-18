@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Response Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #1a1a1a; color: white; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .result { background: #2a2a2a; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .error { background: #4a1a1a; border: 1px solid #ff4444; }
+        .success { background: #1a4a1a; border: 1px solid #44ff44; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+        button { background: #4a90e2; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #357abd; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 API Response Test</h1>
+        <p>Testing what the venue detail API is actually returning for price_level</p>
+        
+        <button onclick="testVenueList()">Test Venue List API</button>
+        <button onclick="testVenueDetail()">Test Venue Detail API</button>
+        <button onclick="testPriceMapping()">Test Price Mapping</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8001/api';
+        
+        function addResult(title, content, isError = false) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${isError ? 'error' : 'success'}`;
+            div.innerHTML = `<h3>${title}</h3><pre>${content}</pre>`;
+            results.appendChild(div);
+        }
+        
+        async function testVenueList() {
+            try {
+                const response = await fetch(`${API_BASE}/venues?limit=3`);
+                const data = await response.json();
+                
+                if (data.data && data.data.length > 0) {
+                    const venue = data.data[0];
+                    addResult('✅ Venue List API Response', 
+                        `Venue: ${venue.name}\n` +
+                        `Type: ${venue.type}\n` +
+                        `Price Level: "${venue.price_level}" (type: ${typeof venue.price_level})\n\n` +
+                        `Full venue object:\n${JSON.stringify(venue, null, 2)}`
+                    );
+                    
+                    // Store venue ID for detail test
+                    window.testVenueId = venue.id;
+                } else {
+                    addResult('❌ Venue List API Error', 'No venues returned', true);
+                }
+            } catch (error) {
+                addResult('❌ Venue List API Error', error.message, true);
+            }
+        }
+        
+        async function testVenueDetail() {
+            if (!window.testVenueId) {
+                addResult('❌ Venue Detail Test', 'Run venue list test first to get a venue ID', true);
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/venues/${window.testVenueId}`);
+                const venue = await response.json();
+                
+                addResult('✅ Venue Detail API Response', 
+                    `Venue: ${venue.name}\n` +
+                    `Type: ${venue.type}\n` +
+                    `Price Level: "${venue.price_level}" (type: ${typeof venue.price_level})\n\n` +
+                    `Full venue object:\n${JSON.stringify(venue, null, 2)}`
+                );
+            } catch (error) {
+                addResult('❌ Venue Detail API Error', error.message, true);
+            }
+        }
+        
+        function testPriceMapping() {
+            const priceMap = {
+                // Numeric format
+                0: 'Free',
+                1: '$10-20 per person',
+                2: '$20-40 per person', 
+                3: '$40-80 per person',
+                4: '$80+ per person',
+                // Google Places API string format
+                'PRICE_LEVEL_FREE': 'Free',
+                'PRICE_LEVEL_INEXPENSIVE': '$10-20 per person',
+                'PRICE_LEVEL_MODERATE': '$20-40 per person',
+                'PRICE_LEVEL_EXPENSIVE': '$40-80 per person',
+                'PRICE_LEVEL_VERY_EXPENSIVE': '$80+ per person'
+            };
+            
+            const testValues = [
+                null, undefined, '', 'PRICE_LEVEL_MODERATE', 'PRICE_LEVEL_INEXPENSIVE', 
+                'PRICE_LEVEL_EXPENSIVE', 0, 1, 2, 3, 4, 'invalid_value'
+            ];
+            
+            let results = 'Price Mapping Test Results:\n\n';
+            testValues.forEach(value => {
+                const mapped = priceMap[value] || 'Price varies';
+                results += `"${value}" (${typeof value}) → "${mapped}"\n`;
+            });
+            
+            addResult('🧪 Price Mapping Test', results);
+        }
+        
+        // Auto-run tests on page load
+        window.onload = function() {
+            setTimeout(() => {
+                testVenueList();
+                setTimeout(() => {
+                    testVenueDetail();
+                    testPriceMapping();
+                }, 1000);
+            }, 500);
+        };
+    </script>
+</body>
+</html>

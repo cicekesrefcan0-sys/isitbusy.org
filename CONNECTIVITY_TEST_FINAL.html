@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Connectivity Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0a0a0f;
+            color: white;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-result {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #22c55e;
+        }
+        .error {
+            border-left-color: #ef4444;
+        }
+        .venue-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .venue-card:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+        .venue-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #60a5fa;
+            margin-bottom: 8px;
+        }
+        .venue-address {
+            color: #9ca3af;
+            margin-bottom: 8px;
+        }
+        .venue-meta {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover { background: #2563eb; }
+        .success { color: #22c55e; }
+        .error-text { color: #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Final Connectivity Test</h1>
+        <p>Testing if frontend can connect to backend and load venue data.</p>
+        
+        <button onclick="runTest()">🚀 Run Full Test</button>
+        <button onclick="testFrontendAPI()">🔗 Test Frontend API Connection</button>
+        <button onclick="openFrontend()">🌐 Open Frontend</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        async function runTest() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h2>🧪 Test Results</h2>';
+            
+            // Test 1: Backend Direct
+            await testBackendDirect();
+            
+            // Test 2: Frontend API (simulating what React app does)
+            await testFrontendAPI();
+            
+            // Test 3: Venue Navigation
+            await testVenueNavigation();
+        }
+
+        async function testBackendDirect() {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                const response = await fetch('http://localhost:8001/api/venues?limit=3');
+                const data = await response.json();
+                const venues = data.data || data;
+                
+                if (venues.length > 0) {
+                    resultsDiv.innerHTML += `
+                        <div class="test-result">
+                            <h3>✅ Backend Direct Connection</h3>
+                            <p class="success">Successfully loaded ${venues.length} venues from backend</p>
+                            <p>Backend URL: http://localhost:8001/api/venues</p>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML += `
+                        <div class="test-result error">
+                            <h3>❌ Backend Direct Connection</h3>
+                            <p class="error-text">Backend returned empty data</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML += `
+                    <div class="test-result error">
+                        <h3>❌ Backend Direct Connection</h3>
+                        <p class="error-text">Error: ${error.message}</p>
+                        <p>Make sure backend is running on port 8001</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testFrontendAPI() {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                // This simulates what the React frontend does
+                const API = 'http://localhost:8001/api';
+                const response = await fetch(`${API}/venues?limit=5`);
+                const data = await response.json();
+                const venues = Array.isArray(data) ? data : (data.data || []);
+                
+                if (venues.length > 0) {
+                    resultsDiv.innerHTML += `
+                        <div class="test-result">
+                            <h3>✅ Frontend API Connection</h3>
+                            <p class="success">Frontend can successfully connect to backend</p>
+                            <p>Loaded ${venues.length} venues using React app configuration</p>
+                            <div style="margin-top: 16px;">
+                                <h4>Sample Venues:</h4>
+                                ${venues.slice(0, 3).map(venue => `
+                                    <div class="venue-card" onclick="testVenueDetail('${venue.id}')">
+                                        <div class="venue-name">${venue.name}</div>
+                                        <div class="venue-address">📍 ${venue.address}</div>
+                                        <div class="venue-meta">
+                                            🏷️ ${venue.type} | 
+                                            ⭐ ${venue.rating || 'N/A'} | 
+                                            🔗 ${venue.data_source} |
+                                            🖼️ ${venue.image_url ? 'Has image' : 'No image'}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    resultsDiv.innerHTML += `
+                        <div class="test-result error">
+                            <h3>❌ Frontend API Connection</h3>
+                            <p class="error-text">No venues returned from API</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML += `
+                    <div class="test-result error">
+                        <h3>❌ Frontend API Connection</h3>
+                        <p class="error-text">Error: ${error.message}</p>
+                        <p>This is the same error the React frontend would see</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testVenueNavigation() {
+            const resultsDiv = document.getElementById('results');
+            
+            try {
+                const response = await fetch('http://localhost:8001/api/venues?limit=1');
+                const data = await response.json();
+                const venues = Array.isArray(data) ? data : (data.data || []);
+                
+                if (venues.length > 0) {
+                    const venue = venues[0];
+                    const detailResponse = await fetch(`http://localhost:8001/api/venues/${venue.id}`);
+                    
+                    if (detailResponse.ok) {
+                        const venueDetail = await detailResponse.json();
+                        resultsDiv.innerHTML += `
+                            <div class="test-result">
+                                <h3>✅ Venue Navigation</h3>
+                                <p class="success">Venue detail pages will work correctly</p>
+                                <p>Test venue: ${venueDetail.name}</p>
+                                <p>Frontend URL: <a href="http://localhost:3000/venue/${venue.id}" target="_blank" style="color: #60a5fa;">http://localhost:3000/venue/${venue.id}</a></p>
+                            </div>
+                        `;
+                    } else {
+                        resultsDiv.innerHTML += `
+                            <div class="test-result error">
+                                <h3>❌ Venue Navigation</h3>
+                                <p class="error-text">Venue detail endpoint failed: ${detailResponse.status}</p>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                resultsDiv.innerHTML += `
+                    <div class="test-result error">
+                        <h3>❌ Venue Navigation</h3>
+                        <p class="error-text">Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testVenueDetail(venueId) {
+            try {
+                const response = await fetch(`http://localhost:8001/api/venues/${venueId}`);
+                if (response.ok) {
+                    const venue = await response.json();
+                    alert(`✅ Venue Detail Test Successful!\n\nVenue: ${venue.name}\nAddress: ${venue.address}\nType: ${venue.type}\n\nThis venue can be accessed at:\nhttp://localhost:3000/venue/${venueId}`);
+                    
+                    // Open the venue page in frontend
+                    window.open(`http://localhost:3000/venue/${venueId}`, '_blank');
+                } else {
+                    alert(`❌ Venue Detail Failed\nHTTP Status: ${response.status}`);
+                }
+            } catch (error) {
+                alert(`❌ Connection Error\n${error.message}`);
+            }
+        }
+
+        function openFrontend() {
+            window.open('http://localhost:3000', '_blank');
+        }
+
+        // Auto-run test on page load
+        window.addEventListener('load', () => {
+            runTest();
+        });
+    </script>
+</body>
+</html>

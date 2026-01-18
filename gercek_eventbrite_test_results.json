@@ -1,0 +1,20 @@
+{
+  "timestamp": "2026-01-18T04:24:45.956438",
+  "test_type": "real_eventbrite_web_scraping",
+  "test_results": {
+    "events_found": 0,
+    "sample_event": null
+  },
+  "scrape_stats": {
+    "cities_searched": 6,
+    "total_events_found": 0,
+    "regular_events": 0,
+    "after_parties": 0,
+    "events_saved": 0,
+    "errors": 0
+  },
+  "web_regular_events_count": 0,
+  "web_after_parties_count": 0,
+  "sample_real_event": null,
+  "sample_real_after_party": null
+}

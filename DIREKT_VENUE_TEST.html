@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direkt Venue Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .test-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #3b82f6;
+        }
+        .success-card {
+            border-left-color: #10b981;
+        }
+        .error-card {
+            border-left-color: #ef4444;
+        }
+        .warning-card {
+            border-left-color: #f59e0b;
+        }
+        .test-button {
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+        .test-button:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .url-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .url-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .test-results {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .success { color: #10b981; }
+        .error { color: #ef4444; }
+        .warning { color: #f59e0b; }
+        .info { color: #3b82f6; }
+        h1, h2 { text-align: center; }
+        .iframe-container {
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 20px 0;
+            height: 600px;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 5px;
+        }
+        .venue-info {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Direkt Venue Navigasyon Test</h1>
+        <p style="text-align: center;">Gerçek problemi bulmak için direkt venue URL'ini test edelim</p>
+        
+        <div class="venue-info">
+            <h3>🎯 Test Venue Bilgileri</h3>
+            <div id="venue-info">Venue bilgileri yükleniyor...</div>
+        </div>
+
+        <div class="test-card">
+            <h3>🔗 Frontend URL Testi</h3>
+            <p>Aşağıdaki URL'leri test edin:</p>
+            <input type="text" class="url-input" id="venue-url-3000" placeholder="http://localhost:3000/venue/{id}" readonly>
+            <input type="text" class="url-input" id="venue-url-3001" placeholder="http://localhost:3001/venue/{id}" readonly>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <button class="test-button" onclick="testPort(3000)">Port 3000 Test</button>
+                <button class="test-button" onclick="testPort(3001)">Port 3001 Test</button>
+                <button class="test-button" onclick="loadVenueInfo()">Venue Bilgisi Yükle</button>
+            </div>
+        </div>
+
+        <div class="test-results">
+            <h3>🧪 Test Sonuçları</h3>
+            <div id="test-log">Test başlatılmadı...</div>
+        </div>
+
+        <div class="test-card warning-card">
+            <h3>📋 Manuel Test Adımları</h3>
+            <ol>
+                <li><strong>Venue Bilgisi Yükle:</strong> Yukarıdaki butona tıklayın</li>
+                <li><strong>URL Kopyala:</strong> Oluşan URL'yi kopyalayın</li>
+                <li><strong>Yeni Sekme Aç:</strong> URL'yi yeni sekmede açın</li>
+                <li><strong>Sonucu Gözlemle:</strong> Ne olduğunu kontrol edin</li>
+                <li><strong>F12 Aç:</strong> Developer Tools ile console'u kontrol edin</li>
+            </ol>
+        </div>
+
+        <div class="test-card error-card">
+            <h3>🔍 Aranacak Sorunlar</h3>
+            <ul>
+                <li><strong>Sayfa yüklenmiyor:</strong> Beyaz/boş sayfa</li>
+                <li><strong>404 Not Found:</strong> Route bulunamadı</li>
+                <li><strong>Loading sonsuz döngü:</strong> Sürekli loading</li>
+                <li><strong>Yanlış venue:</strong> Farklı venue bilgileri</li>
+                <li><strong>Console hataları:</strong> JavaScript hataları</li>
+                <li><strong>API hataları:</strong> Network sekmesinde 500/404</li>
+            </ul>
+        </div>
+
+        <div class="iframe-container" id="iframe-container" style="display: none;">
+            <iframe id="venue-iframe" src=""></iframe>
+        </div>
+    </div>
+
+    <script>
+        let testVenue = null;
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('test-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'info';
+            logDiv.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        async function loadVenueInfo() {
+            log('🔍 Backend\'den venue bilgisi alınıyor...', 'info');
+            
+            try {
+                const response = await fetch('http://localhost:8001/api/venues?limit=1');
+                if (response.ok) {
+                    const data = await response.json();
+                    const venues = data.data || [];
+                    
+                    if (venues.length > 0) {
+                        testVenue = venues[0];
+                        const venueId = testVenue.id;
+                        const venueName = testVenue.name;
+                        
+                        log(`✅ Venue yüklendi: ${venueName}`, 'success');
+                        log(`🆔 Venue ID: ${venueId}`, 'info');
+                        
+                        // Venue bilgilerini göster
+                        document.getElementById('venue-info').innerHTML = `
+                            <strong>İsim:</strong> ${venueName}<br>
+                            <strong>ID:</strong> ${venueId}<br>
+                            <strong>Adres:</strong> ${testVenue.address}<br>
+                            <strong>Tip:</strong> ${testVenue.type}<br>
+                            <strong>Rating:</strong> ${testVenue.rating || 'N/A'}
+                        `;
+                        
+                        // URL'leri güncelle
+                        const url3000 = `http://localhost:3000/venue/${venueId}`;
+                        const url3001 = `http://localhost:3001/venue/${venueId}`;
+                        
+                        document.getElementById('venue-url-3000').value = url3000;
+                        document.getElementById('venue-url-3001').value = url3001;
+                        
+                        log(`🔗 Test URL'leri hazırlandı`, 'success');
+                        log(`   Port 3000: ${url3000}`, 'info');
+                        log(`   Port 3001: ${url3001}`, 'info');
+                        
+                    } else {
+                        log('❌ Hiç venue bulunamadı', 'error');
+                    }
+                } else {
+                    log(`❌ Backend API hatası: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Venue yükleme hatası: ${error.message}`, 'error');
+            }
+        }
+
+        async function testPort(port) {
+            if (!testVenue) {
+                log('❌ Önce venue bilgisini yükleyin!', 'error');
+                return;
+            }
+
+            const venueId = testVenue.id;
+            const venueName = testVenue.name;
+            const testUrl = `http://localhost:${port}/venue/${venueId}`;
+            
+            log(`🔍 Port ${port} test ediliyor...`, 'info');
+            log(`🔗 Test URL: ${testUrl}`, 'info');
+            
+            try {
+                // Frontend'in ana sayfasını test et
+                const frontendResponse = await fetch(`http://localhost:${port}`);
+                if (frontendResponse.ok) {
+                    log(`✅ Frontend Port ${port} erişilebilir`, 'success');
+                    
+                    // Iframe'de venue sayfasını aç
+                    const iframeContainer = document.getElementById('iframe-container');
+                    const iframe = document.getElementById('venue-iframe');
+                    
+                    iframe.src = testUrl;
+                    iframeContainer.style.display = 'block';
+                    
+                    log(`🚀 Venue sayfası iframe'de açıldı`, 'success');
+                    log(`📋 Kontrol edin: "${venueName}" bilgileri görünüyor mu?`, 'warning');
+                    
+                    // Ayrıca yeni sekmede aç
+                    window.open(testUrl, '_blank');
+                    log(`🔗 Yeni sekmede de açıldı`, 'info');
+                    
+                } else {
+                    log(`❌ Frontend Port ${port} erişilemiyor: ${frontendResponse.status}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ Port ${port} test hatası: ${error.message}`, 'error');
+                log(`💡 Frontend Port ${port}'da çalışmıyor olabilir`, 'warning');
+            }
+        }
+
+        // Sayfa yüklendiğinde otomatik venue bilgisi yükle
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🚀 Direkt Venue Test başlatıldı', 'info');
+            log('📋 Adım 1: "Venue Bilgisi Yükle" butonuna tıklayın', 'warning');
+            
+            // 2 saniye sonra otomatik yükle
+            setTimeout(() => {
+                loadVenueInfo();
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
